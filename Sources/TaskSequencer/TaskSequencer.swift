@@ -9,7 +9,7 @@
 import Foundation
 
 
-class DelayedOperation: Operation {
+public class DelayedOperation: Operation {
     var task: () -> Void
     var delay: TimeInterval
     let id: String
@@ -21,13 +21,13 @@ class DelayedOperation: Operation {
         super.init()
     }
 
-    override func main() {
+    public override func main() {
         if isCancelled { return }
         Thread.sleep(forTimeInterval: delay)
         task()
     }
 }
-class AsyncDelayedOperation: Operation {
+public class AsyncDelayedOperation: Operation {
     var task: () async -> Void
     var delay: TimeInterval
     let id: String
@@ -39,7 +39,7 @@ class AsyncDelayedOperation: Operation {
         super.init()
     }
 
-    override func main() {
+    public override func main() {
         guard !isCancelled else { return }
 
         let taskGroup = DispatchGroup()
@@ -66,7 +66,7 @@ class AsyncDelayedOperation: Operation {
 
 
 
-class TaskSequencer {
+public class TaskSequencer {
     private let queue = OperationQueue()
     private var operations = [String: DelayedOperation]()
     
