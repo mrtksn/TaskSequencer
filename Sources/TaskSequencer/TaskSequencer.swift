@@ -14,7 +14,7 @@ public class DelayedOperation: Operation {
     var delay: TimeInterval
     let id: String
 
-    init(id: String, delay: TimeInterval, task: @escaping () -> Void) {
+    public init(id: String, delay: TimeInterval, task: @escaping () -> Void) {
         self.id = id
         self.delay = delay
         self.task = task
@@ -32,7 +32,7 @@ public class AsyncDelayedOperation: Operation {
     var delay: TimeInterval
     let id: String
 
-    init(id: String, delay: TimeInterval, task: @escaping () async -> Void) {
+    public init(id: String, delay: TimeInterval, task: @escaping () async -> Void) {
         self.id = id
         self.delay = delay
         self.task = task
@@ -70,7 +70,7 @@ public class TaskSequencer {
     private let queue = OperationQueue()
     private var operations = [String: DelayedOperation]()
     
-    init() {
+    public init() {
             // Add a dummy task
         addTaskWithDelay(id: "dummy", delay: 0) { /* Dummy task code */ }
             // Pause the queue immediately
