@@ -82,7 +82,7 @@ public class TaskSequencer {
     ///   - id: Optional ID. Can be useful to provide an ID if you plan to cancel a specific task later
     ///   - delay: how much to wait before executing
     ///   - task: the task to execute
-    func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () -> Void) {
+    public func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () -> Void) {
         let operation = DelayedOperation(id: id, delay: delay, task: task)
         operations[id] = operation
         queue.addOperation(operation)
@@ -93,41 +93,41 @@ public class TaskSequencer {
     ///   - id: Optional ID. Can be useful to provide an ID if you plan to cancel a specific task later
     ///   - delay: how much to wait before executing
     ///   - task: the async task to execute. Useful to use with async/await
-    func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () async -> Void) {
+    public func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () async -> Void) {
         let operation = AsyncDelayedOperation(id: id, delay: delay, task: task)
            queue.addOperation(operation)
        }
     
     /// Remove a task from the queue
     /// - Parameter id: the id of the task to remove
-    func removeTaskByID(id: String) {
+    public func removeTaskByID(id: String) {
         operations[id]?.cancel()
         operations.removeValue(forKey: id)
     }
     
     /// a convinience function. the same as resume()
-    func start() {
+    public func start() {
         resume()
     }
     
     
     /// Pause until resume or cancel
-    func pause() {
+    public func pause() {
         queue.isSuspended = true
     }
     
     /// resume current que execution
-    func resume() {
+    public func resume() {
         queue.isSuspended = false
     }
     
     /// cancel the current execution queue
-    func cancel() {
+    public func cancel() {
         queue.cancelAllOperations()
     }
     
     /// cancel the current execution and remove all the defined tasks
-    func reset() {
+    public func reset() {
         cancel()
         operations.removeAll()
     }
