@@ -37,13 +37,13 @@ Install like any other Swift package.
 
 ```
 
-Removing a Task
+**Removing a Task**
 
 ```swift
     sequencer.removeTaskByID(id: "task1")
 ```
 
-Controlling Execution
+**Controlling Execution**
 
 ```swift
     // Pause the sequence
