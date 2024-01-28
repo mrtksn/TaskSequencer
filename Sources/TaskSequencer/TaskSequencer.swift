@@ -66,7 +66,6 @@ public class AsyncDelayedOperation: Operation {
 public class TaskSequencer {
     private let queue = OperationQueue()
     private var operations = [String: DelayedOperation]()
-    private var lastAddedOperation: Operation?
     
     public init() {
         queue.isSuspended = true
@@ -86,16 +85,19 @@ public class TaskSequencer {
     ///   - delay: how much to wait before executing
     ///   - task: the task to execute
     func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () -> Void) {
-            let operation = DelayedOperation(id: id, delay: delay, task: task)
+        // Dummy operation for the delay
+        let delayOperation = DelayedOperation(id: id + "_delay", delay: delay, task: {})
+        
+        // Actual task operation with no delay
+        let actualTaskOperation = DelayedOperation(id: id, delay: 0, task: task)
 
-            // Ensure this operation waits for the last added operation to finish
-            if let lastOp = lastAddedOperation {
-                operation.addDependency(lastOp)
-            }
-            lastAddedOperation = operation
+        // Ensuring the actual task runs after the delay
+        actualTaskOperation.addDependency(delayOperation)
 
-            queue.addOperation(operation)
-        }
+        // Add both operations to the queue
+        queue.addOperation(delayOperation)
+        queue.addOperation(actualTaskOperation)
+    }
     
     /// Add an async task that will wait for some time after the previous task is done
     /// - Parameters:
@@ -103,15 +105,18 @@ public class TaskSequencer {
     ///   - delay: how much to wait before executing
     ///   - task: the async task to execute. Useful to use with async/await
     func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () async -> Void) {
-        let operation = AsyncDelayedOperation(id: id, delay: delay, task: task)
+        // Dummy operation for the delay
+        let delayOperation = AsyncDelayedOperation(id: id + "_delay", delay: delay, task: {})
 
-        // Ensure this operation waits for the last added operation to finish
-        if let lastOp = lastAddedOperation {
-            operation.addDependency(lastOp)
-        }
-        lastAddedOperation = operation
+        // Actual async task operation with no delay
+        let actualTaskOperation = AsyncDelayedOperation(id: id, delay: 0, task: task)
 
-        queue.addOperation(operation)
+        // Ensuring the actual task runs after the delay
+        actualTaskOperation.addDependency(delayOperation)
+
+        // Add both operations to the queue
+        queue.addOperation(delayOperation)
+        queue.addOperation(actualTaskOperation)
     }
     
     /// Remove a task from the queue
