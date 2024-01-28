@@ -1,13 +1,10 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+//
 //  TaskSequencer.swift
 //  QuitKit
 //
-//  Created by Mertol on 27/01/2024.
+//  Created by Mertol on 28/01/2024.
 //
-
 import Foundation
-
 
 public class DelayedOperation: Operation {
     var task: () -> Void
@@ -69,34 +66,53 @@ public class AsyncDelayedOperation: Operation {
 public class TaskSequencer {
     private let queue = OperationQueue()
     private var operations = [String: DelayedOperation]()
+    private var lastAddedOperation: Operation?
     
     public init() {
-            // Add a dummy task
-        addTaskWithDelay(id: "dummy", delay: 0) { /* Dummy task code */ }
-            // Pause the queue immediately
-            pause()
-        }
+        queue.isSuspended = true
+        queue.maxConcurrentOperationCount = 1
+        /*
+         // Add a dummy task
+     addTaskWithDelay(id: "dummy", delay: 0) { /* Dummy task code */ }
+         // Pause the queue immediately
+         pause()
+     
+         */
+    }
     
     /// Add a task that will wait for some time after the previous task is done
     /// - Parameters:
     ///   - id: Optional ID. Can be useful to provide an ID if you plan to cancel a specific task later
     ///   - delay: how much to wait before executing
     ///   - task: the task to execute
-    public func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () -> Void) {
-        let operation = DelayedOperation(id: id, delay: delay, task: task)
-        operations[id] = operation
-        queue.addOperation(operation)
-    }
+    func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () -> Void) {
+            let operation = DelayedOperation(id: id, delay: delay, task: task)
+
+            // Ensure this operation waits for the last added operation to finish
+            if let lastOp = lastAddedOperation {
+                operation.addDependency(lastOp)
+            }
+            lastAddedOperation = operation
+
+            queue.addOperation(operation)
+        }
     
     /// Add an async task that will wait for some time after the previous task is done
     /// - Parameters:
     ///   - id: Optional ID. Can be useful to provide an ID if you plan to cancel a specific task later
     ///   - delay: how much to wait before executing
     ///   - task: the async task to execute. Useful to use with async/await
-    public func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () async -> Void) {
+    func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () async -> Void) {
         let operation = AsyncDelayedOperation(id: id, delay: delay, task: task)
-           queue.addOperation(operation)
-       }
+
+        // Ensure this operation waits for the last added operation to finish
+        if let lastOp = lastAddedOperation {
+            operation.addDependency(lastOp)
+        }
+        lastAddedOperation = operation
+
+        queue.addOperation(operation)
+    }
     
     /// Remove a task from the queue
     /// - Parameter id: the id of the task to remove
