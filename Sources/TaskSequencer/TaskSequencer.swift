@@ -84,7 +84,7 @@ public class TaskSequencer {
     ///   - id: Optional ID. Can be useful to provide an ID if you plan to cancel a specific task later
     ///   - delay: how much to wait before executing
     ///   - task: the task to execute
-    func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () -> Void) {
+    public func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () -> Void) {
         // Dummy operation for the delay
         let delayOperation = DelayedOperation(id: id + "_delay", delay: delay, task: {})
         
@@ -104,7 +104,7 @@ public class TaskSequencer {
     ///   - id: Optional ID. Can be useful to provide an ID if you plan to cancel a specific task later
     ///   - delay: how much to wait before executing
     ///   - task: the async task to execute. Useful to use with async/await
-    func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () async -> Void) {
+    public func addTaskWithDelay(id: String = UUID().uuidString, delay: TimeInterval, task: @escaping () async -> Void) {
         // Dummy operation for the delay
         let delayOperation = AsyncDelayedOperation(id: id + "_delay", delay: delay, task: {})
 
